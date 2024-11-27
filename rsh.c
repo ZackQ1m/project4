@@ -69,7 +69,7 @@ void *messageListener(void *arg) {
     while (1) {
         if (read(userFIFO, &incoming, sizeof(incoming)) > 0) {
             // Print the incoming message
-            printf("Incoming message from [%s]: %s\n", incoming.source, incoming.msg);
+            printf("Incoming message from %s: %s\n", incoming.source, incoming.msg);
         }
     }
 
