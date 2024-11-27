@@ -27,7 +27,6 @@ void terminate(int sig) {
 }
 
 void sendmsg(char *user, char *target, char *msg) {
-    // Send a request to the server to send the message (msg) to the target user (target)
     struct message req;
     int server;
 
@@ -52,7 +51,6 @@ void sendmsg(char *user, char *target, char *msg) {
 }
 
 void *messageListener(void *arg) {
-    // Read user's own FIFO in an infinite loop for incoming messages
     struct message incoming;
     int userFIFO;
 
@@ -70,6 +68,7 @@ void *messageListener(void *arg) {
         if (read(userFIFO, &incoming, sizeof(incoming)) > 0) {
             // Print the incoming message
             printf("Incoming message from %s: %s\n", incoming.source, incoming.msg);
+            fflush(stdout);
         }
     }
 
@@ -107,6 +106,7 @@ int main(int argc, char **argv) {
         perror("Failed to create message listener thread");
         exit(1);
     }
+    // Do NOT join the thread; allow it to run concurrently
 
     while (1) {
         fprintf(stderr, "rsh>");
@@ -188,12 +188,12 @@ int main(int argc, char **argv) {
 
         if (posix_spawnp(&pid, path, NULL, &attr, cargv, environ) != 0) {
             perror("spawn failed");
-            exit(EXIT_FAILURE);
+            exit(1);
         }
 
         if (waitpid(pid, &status, 0) == -1) {
             perror("waitpid failed");
-            exit(EXIT_FAILURE);
+            exit(1);
         }
 
         posix_spawnattr_destroy(&attr);

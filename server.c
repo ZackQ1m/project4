@@ -23,7 +23,7 @@ int main() {
     int target;
     int dummyfd;
     struct message req;
-    signal(SIGPIPE, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN); // Ignore SIGPIPE errors
     signal(SIGINT, terminate);
 
     // Open server FIFO for reading and writing
@@ -46,15 +46,17 @@ int main() {
             continue;
         }
 
+        // Print received request (matching expected output format)
         printf("Received a request from %s to send the message %s to %s.\n",
                req.source, req.msg, req.target);
+        fflush(stdout);
 
         // Open target FIFO and write the whole message struct to the target FIFO
         char targetFIFO[60];
         snprintf(targetFIFO, sizeof(targetFIFO), "%s", req.target);
         target = open(targetFIFO, O_WRONLY);
         if (target < 0) {
-            perror("Failed to open target FIFO");
+            perror("Error opening target FIFO");
             continue;
         }
 
@@ -62,6 +64,7 @@ int main() {
             perror("Error writing to target FIFO");
         } else {
             printf("Message sent to %s successfully.\n", req.target);
+            fflush(stdout);
         }
 
         close(target); // Close target FIFO after writing the message
